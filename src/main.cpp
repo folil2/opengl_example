@@ -61,13 +61,14 @@ int main(int argc, const char** argv) {
     auto glVersion = glGetString(GL_VERSION);
     SPDLOG_INFO("OpenGL context version: {}", glVersion);
 
+    OnFramebufferSizeChange(window, WINDOw_WIDTH, WINDOW_HEIGHT);
     glfwSetFramebufferSizeCallback(window, OnFramebufferSizeChange);
-
+    glfwSetKeyCallback(window, OnKeyEvent);
     // glfw 루프 실행, 윈도우 close 버튼을 누르면 정상 종료
     SPDLOG_INFO("Start main loop");
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+        glClearColor(0.0f, 0.1f, 0.2f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glfwSwapBuffers(window);
     }
