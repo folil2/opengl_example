@@ -1,3 +1,5 @@
+#include "context.h"
+
 #include <spdlog/spdlog.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -41,16 +43,14 @@ int main(int argc, const char** argv) {
 
     // glfw 윈도우 생성, 실패하면 에러 출력후 종료
     SPDLOG_INFO("Create glfw window");
-    auto window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME,
-      nullptr, nullptr);
+    auto window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, nullptr, nullptr);
     if (!window) {
         SPDLOG_ERROR("failed to create glfw window");
         glfwTerminate();
         return -1;
     }
-    OnFramebufferSizeChange(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+    
     glfwMakeContextCurrent(window);
-    glfwSetKeyCallback(window, OnKeyEvent);
 
     // glad를 활용한 OpenGL 함수 로딩
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -61,17 +61,25 @@ int main(int argc, const char** argv) {
     auto glVersion = glGetString(GL_VERSION);
     SPDLOG_INFO("OpenGL context version: {}", glVersion);
 
-    OnFramebufferSizeChange(window, WINDOw_WIDTH, WINDOW_HEIGHT);
+    auto context = Context::Create();
+    if (!context) {
+        SPDLOG_ERROR("failed to create context");
+        glfwTerminate();
+        return -1;
+    }
+
+    OnFramebufferSizeChange(window, WINDOW_WIDTH, WINDOW_HEIGHT);
     glfwSetFramebufferSizeCallback(window, OnFramebufferSizeChange);
     glfwSetKeyCallback(window, OnKeyEvent);
+
     // glfw 루프 실행, 윈도우 close 버튼을 누르면 정상 종료
     SPDLOG_INFO("Start main loop");
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        glClearColor(0.0f, 0.1f, 0.2f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        context->Render();
         glfwSwapBuffers(window);
     }
+    context.reset();
 
     glfwTerminate();
 
