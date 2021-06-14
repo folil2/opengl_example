@@ -4,6 +4,7 @@
     },
     "files.associations": {
         "regex": "cpp",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "vector": "cpp"
     }
 }
